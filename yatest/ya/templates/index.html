@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Приложение</title>
+</head>
+<body>
+    <h2>Введите ссылку на диск</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% for i in all_files %}
+        {{i.name}}
+        <p>123</p>
+        {% endfor %}
+        <button type="submit">Получить</button>
+    </form>
+</body>
+</html>
