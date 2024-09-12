@@ -10,7 +10,7 @@
         {{ form.as_p }}
         {% for i in all_files %}
         {{i.name}}
-        <p>123</p>
+        <a href={{i.path}}> {{i.path}} </a>
         {% endfor %}
         <button type="submit">Получить</button>
     </form>
