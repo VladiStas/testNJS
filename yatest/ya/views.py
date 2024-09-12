@@ -1,6 +1,6 @@
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from .forms import LinkForm
 from .config import HEADERS
 import requests
@@ -11,16 +11,18 @@ params = {'type': 'dir',}
 def index(request):
     if request.method == "POST":
         linkForm = LinkForm(request.POST)
-        if 'reset_token' in request.POST:
-            linkForm.fields['link'].initial = ''
+        if 'reset_token' in request.POST:  # Очистка полей
+            linkForm = LinkForm()
         elif linkForm.is_valid():
             try:
-                key = linkForm.cleaned_data['link']
-                HEADERS['Authorization'] = f'OAuth {key}'
-
+                key = linkForm.cleaned_data['link']  # Получение ключа
+                HEADERS['Authorization'] = f'OAuth {key}' # Добавление ключа в HEADERS
+                
+                """ Получение данных о папках и файлах на диске и о пользователе"""
                 responseAllFiles = requests.get(f'{BASE_URL}/resources?path=%2F&limit=100', headers=HEADERS, params=params).json()
                 responseUserDisk = requests.get(f'{BASE_URL}', headers=HEADERS, params=params).json()
 
+                """ Конкретная выборка папок, файлов и имени пользователя """
                 items = responseAllFiles["_embedded"]["items"]
                 user = responseUserDisk["user"]["display_name"]
 
@@ -32,8 +34,10 @@ def index(request):
     return render(request, 'index.html', {"form": linkForm})
 
 
+# Скачивание конкретного файла
 def downloadFile(request, path):
     if request.method == "GET":
+        # Получение ссылки на скачивание
         linkDownload = requests.get(f'{BASE_URL}/resources/download?path={path}', headers=HEADERS, params=params).json()['href']
         return HttpResponseRedirect(linkDownload)
     
