@@ -1,6 +1,8 @@
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from .forms import LinkForm
+from .config import HEADERS
 import requests
 
 BASE_URL = 'https://cloud-api.yandex.net/v1/disk'
@@ -12,13 +14,19 @@ def index(request):
         if linkForm.is_valid():
             try:
                 key = linkForm.cleaned_data['link']
-                headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'OAuth {key}'}
-                responseAllFiles = requests.get(f'{BASE_URL}/resources?path=%2F&limit=100', headers=headers, params=params).json()
-
+                HEADERS['Authorization'] = f'OAuth {key}'
+                responseAllFiles = requests.get(f'{BASE_URL}/resources?path=%2F&limit=100', headers=HEADERS, params=params).json()
                 items = responseAllFiles["_embedded"]["items"]
+
                 return render(request, 'index.html', {"form": linkForm, "all_files": items})
-            except:
-                print("Ошибка")
+            except Exception as e:
+                print(e)
     else:
         linkForm = LinkForm(request.POST)
     return render(request, 'index.html', {"form": linkForm})
+
+
+def downloadFile(request, path):
+    if request.method == "GET":
+        linkDownload = requests.get(f'{BASE_URL}/resources/download?path={path}', headers=HEADERS, params=params).json()['href']
+        return HttpResponseRedirect(linkDownload)

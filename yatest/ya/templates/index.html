@@ -4,15 +4,16 @@
     <title>Приложение</title>
 </head>
 <body>
-    <h2>Введите ссылку на диск</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        <input type="submit" name="action" value="Получить"></input><br>
+
         {% for i in all_files %}
-        {{i.name}}
-        <a href={{i.path}}> {{i.path}} </a>
+            {{i.name}}
+            <a href="{% url 'downloadFile' path=i.path %}">Скачать</a><br>
         {% endfor %}
-        <button type="submit">Получить</button>
+        
     </form>
 </body>
 </html>
