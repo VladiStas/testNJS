@@ -2,8 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Приложение</title>
+    <title>YA</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
 </head>
 <body>
     <form method="post">
@@ -11,11 +13,22 @@
         {{ form.as_p }}
         <input type="submit" name="action" value="Получить"></input><br>
 
+        {% if username %}
         <table>
+            <tr>
+                <th class="stroke-wb"><p>Вы вошли как: {{username}}</p></th>
+                <th class="stroke-wb"><button type="submit" name="reset_token" value="true">Очистить таблицу</button><br></th>
+            </tr> 
+        </table>
+        {% endif %}
+
+        <table>
+            {% if all_files%}
             <tr>
                 <th>Имя файла</th>
                 <th></th>
             </tr>
+            {% endif %}
             {% for i in all_files %}
             <tr>
                 <td>{{i.name}}</td>

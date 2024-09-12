@@ -11,14 +11,20 @@ params = {'type': 'dir',}
 def index(request):
     if request.method == "POST":
         linkForm = LinkForm(request.POST)
-        if linkForm.is_valid():
+        if 'reset_token' in request.POST:
+            linkForm.fields['link'].initial = ''
+        elif linkForm.is_valid():
             try:
                 key = linkForm.cleaned_data['link']
                 HEADERS['Authorization'] = f'OAuth {key}'
-                responseAllFiles = requests.get(f'{BASE_URL}/resources?path=%2F&limit=100', headers=HEADERS, params=params).json()
-                items = responseAllFiles["_embedded"]["items"]
 
-                return render(request, 'index.html', {"form": linkForm, "all_files": items})
+                responseAllFiles = requests.get(f'{BASE_URL}/resources?path=%2F&limit=100', headers=HEADERS, params=params).json()
+                responseUserDisk = requests.get(f'{BASE_URL}', headers=HEADERS, params=params).json()
+
+                items = responseAllFiles["_embedded"]["items"]
+                user = responseUserDisk["user"]["display_name"]
+
+                return render(request, 'index.html', {"form": linkForm, "all_files": items, "username": user})
             except Exception as e:
                 print(e)
     else:
@@ -30,3 +36,4 @@ def downloadFile(request, path):
     if request.method == "GET":
         linkDownload = requests.get(f'{BASE_URL}/resources/download?path={path}', headers=HEADERS, params=params).json()['href']
         return HttpResponseRedirect(linkDownload)
+    
