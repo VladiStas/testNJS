@@ -1,6 +1,8 @@
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from .forms import LinkForm
 from .config import HEADERS
 import requests
@@ -11,8 +13,13 @@ params = {'type': 'dir',}
 def index(request):
     if request.method == "POST":
         linkForm = LinkForm(request.POST)
+
+        key = make_template_fragment_key("listfiles") 
+        cache.delete(key) # Аннулирование кэша 
+
         if 'reset_token' in request.POST:  # Очистка полей
             linkForm = LinkForm()
+            
         elif linkForm.is_valid():
             try:
                 key = linkForm.cleaned_data['link']  # Получение ключа

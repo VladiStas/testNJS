@@ -4,8 +4,6 @@
 <head>
     <title>YA</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'js/script.js' %}"></script>
 </head>
 <body>
     <form method="post">
@@ -29,14 +27,20 @@
                 <th></th>
             </tr>
             {% endif %}
+
+            {% load cache %}
+
+            {% cache 300 listfiles %}
             {% for i in all_files %}
             <tr>
                 <td>{{i.name}}</td>
                 <td>
                     <a href="{% url 'downloadFile' path=i.path %}" class="download-link">Скачать</a>
                 </td>
-            </tr>
+            </tr> 
             {% endfor %}
+
+            {% endcache %}
         </table>
         
     </form>
