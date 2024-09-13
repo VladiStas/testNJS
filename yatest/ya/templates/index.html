@@ -8,6 +8,10 @@
 <body>
     <form method="post">
         {% csrf_token %}
+
+        {% load cache %}
+        {% cache 300 listfiles %}
+
         {{ form.as_p }}
         <input type="submit" name="action" value="Получить"></input><br>
 
@@ -18,6 +22,8 @@
                 <th class="stroke-wb"><button type="submit" name="reset_token" value="true">Очистить поля</button><br></th>
             </tr> 
         </table>
+        {% else %}
+            <p>Введен неверный ключ!</p>
         {% endif %}
 
         <table>
@@ -28,9 +34,6 @@
             </tr>
             {% endif %}
 
-            {% load cache %}
-
-            {% cache 300 listfiles %}
             {% for i in all_files %}
             <tr>
                 <td>{{i.name}}</td>
